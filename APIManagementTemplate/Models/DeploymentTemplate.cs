@@ -1248,11 +1248,20 @@ namespace APIManagementTemplate.Models
                 jObject["properties"]["oauth2"]["redirectUrl"] = $"[concat('{redirectUrl.Replace(service, "")}', {WrapParameterName(serviceName, false, false)})]";
             }
 
+            // parameterize tokenUrl if present
             var tokenUrl = jObject["properties"]?["oauth2"]?["grantTypes"]?["clientCredentials"]?.Value<string>("tokenUrl");
             if (tokenUrl != null)
             {
                 jObject["properties"]["oauth2"]["grantTypes"]["clientCredentials"]["tokenUrl"] =
                     WrapParameterName(AddParameter($"authorizationProvider_{name}_tokenUrl", "string", tokenUrl));
+            }
+
+            // parameterize resourceUri if present
+            var resourceUri = jObject["properties"]?["oauth2"]?["grantTypes"]?["clientCredentials"]?.Value<string>("resourceUri");
+            if (resourceUri != null)
+            {
+                jObject["properties"]["oauth2"]["grantTypes"]["clientCredentials"]["resourceUri"] =
+                    WrapParameterName(AddParameter($"authorizationProvider_{name}_resourceUri", "string", resourceUri));
             }
 
 
