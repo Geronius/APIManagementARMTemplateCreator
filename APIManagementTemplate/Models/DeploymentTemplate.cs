@@ -1361,6 +1361,12 @@ namespace APIManagementTemplate.Models
             return JObject.FromObject(obj);
         }
 
+        public JObject CreatePolicyfragments(JObject restObject, bool addResource)
+        {
+            var resource = CreateServiceResource(restObject, "Microsoft.ApiManagement/service/policyfragments", addResource);
+             return resource;
+        }
+
         public JObject CreateDiagnostic(JObject restObject, JArray loggers, bool addResource)
         {
             var resource = CreateServiceResource(restObject, "Microsoft.ApiManagement/service/diagnostics", addResource);
