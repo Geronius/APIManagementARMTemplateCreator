@@ -866,8 +866,9 @@ namespace APIManagementTemplate
                     //loop through the defaultValue and search for patterns starting with [
                     foreach (var defaultValue in request.SelectTokens("$..queryParameters..defaultValue").OfType<JValue>())
                     {
-                        //When pattern is found, add a additional [
-                        if (defaultValue.Value<string>()?.StartsWith("[") is true)
+                        //When pattern is found, add [ (ARM only unescapes values that start with [ and end with ])
+                        var value = defaultValue.Value<string>();
+                        if (value != null && value.StartsWith("[") && value.EndsWith("]"))
                         {
                             defaultValue.Value = $"[{defaultValue.Value}";
                         }

@@ -374,7 +374,7 @@ namespace APIManagementTemplate.Models
             {
                 if (example is { Type: JTokenType.String } &&
                     example is JValue { Value: string val } &&
-                    val.StartsWith("[") && !val.StartsWith("[[") &&
+                    NeedsArmEscape(val) &&
                     example.Parent is JProperty parent)
                 {
                     parent.Value = $"[{val}";
@@ -479,11 +479,11 @@ namespace APIManagementTemplate.Models
             {
                 string sample = rep.Value<string>("sample") ?? "";
                 //if sample is an array and start with [ it need's to be escaped
-                if (sample.StartsWith("["))
+                if (NeedsArmEscape(sample))
                     rep["sample"] = "[" + sample;
 
                 string generatedSample = rep.Value<string>("generatedSample") ?? "";
-                if (generatedSample.StartsWith("["))
+                if (NeedsArmEscape(generatedSample))
                     rep["generatedSample"] = "[" + generatedSample;
 
 
@@ -492,10 +492,17 @@ namespace APIManagementTemplate.Models
                     ll.Add(schema);
 
                 var defaultValue = rep.SelectToken("examples.default.value");
-                if (defaultValue != null && defaultValue.ToString().StartsWith("["))
+                if (defaultValue != null && NeedsArmEscape(defaultValue.ToString()))
                     rep["examples"]["default"]["value"] = "[" + defaultValue.ToString();
             }
             return ll;
+        }
+
+        // ARM only evaluates (and unescapes '[[') strings that start with '[' and end with ']'.
+        // Escaping any other string adds a literal '[' that accumulates on every export/deploy cycle.
+        private static bool NeedsArmEscape(string value)
+        {
+            return value.StartsWith("[") && value.EndsWith("]");
         }
 
         /// <summary>
